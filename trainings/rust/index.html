@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>reveal.js</title>
+
+		<link rel="stylesheet" href="../reveal.js/css/reveal.css">
+		<link rel="stylesheet" href="../reveal.js/css/theme/sky.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="../reveal.js/lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? '../reveal.js/css/print/pdf.css' : '../reveal.js/css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+          <h1> RUST </h1>
+          <h3> Fast & super-safe programming language </h3>
+					<p>
+						<small>wrazik, 2018</small>
+					</p>
+        </section>
+				<section>
+          <h3> Why Rust? </h3>
+					<p>
+          <ul>
+            <li class="fragment"> Alternative for low-level C/C++, high performance code </li>
+            <li class="fragment"> Pretty syntax (comparing to template nightmare!)</li>
+            <li class="fragment"> Super-safe</li>
+            <li class="fragment"> Eliminates lots of C/C++ pitfails by design</li>
+            <li class="fragment"> Package manager included!</li>
+            <li class="fragment"> No exceptions! </li>
+            <li class="fragment"> No terrible memory management!</li>
+            <li class="fragment"> Community driven. </li>
+          </ul>
+					</p>
+        </section>
+				<section>
+          <h3>Rust is fast!</h3>
+          <p> <a href="https://benchmarksgame-team.pages.debian.net/benchmarksgame/faster/rust.html"><img src="img/fast.jpg" height=600px /></a></p>
+        </section>
+			</div>
+		</div>
+
+		<script src="../reveal.js/lib/js/head.min.js"></script>
+		<script src="../reveal.js/js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+				dependencies: [
+					{ src: '../reveal.js/plugin/markdown/marked.js' },
+					{ src: '../reveal.js/plugin/markdown/markdown.js' },
+					{ src: '../reveal.js/plugin/notes/notes.js', async: true },
+					{ src: '../reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+		</script>
+	</body>
+</html>
