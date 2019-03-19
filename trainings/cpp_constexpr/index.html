@@ -1,0 +1,324 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>constexpr-land</title>
+
+		<link rel="stylesheet" href="../reveal.js/css/reveal.css">
+		<link rel="stylesheet" href="../reveal.js/css/theme/league.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="../reveal.js/lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? '../reveal.js/css/print/pdf.css' : '../reveal.js/css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+          <h2> constexpr-land </h2>
+					<p>
+            evolution &amp; future of constexpr 
+					</p>
+					<p>
+						<small>wrazik, 2019</small>
+					</p>
+        </section>
+        <section>
+          <h2>constexpr<h2>
+              <p> constexpr keyword was added to C++11</p>
+              <p> In C++ only allowed construction were: </p>
+              <ul> 
+                <li> Single return statement</li>
+              </ul>
+        </section>
+        <section>
+          <h2>C++11<h2>
+        </section>
+        <section>
+          <h2>C++14<h2>
+        </section>
+        <section>
+          <h2>C++17<h2>
+              <p> constexpr lambda</p>
+        </section>
+        <section>
+          <h2>C++20<h2>
+              <p> constexpr virtual</p>
+        </section>
+        <section>
+          <h2>constexpr types<h2>
+        </section>
+        <section>
+          <h2>constexpr new/delete<h2>
+        </section>
+        <section>
+          <h2>limitations<h2>
+              <p> non-trivial_destructor</p>
+              <p> debugging </p>
+        </section>
+        <section>
+          <h2>exceptions<h2>
+        </section>
+        <section>
+          <h2>Compilation<h2>
+        </section>
+        <section>
+          <h1> Questions? </h1>
+        </section>
+        <section>
+          <p>Sources: </p>
+          <ul>
+            <li> <a href="https://www.youtube.com/watch?v=PJwd4JLYJJY">CppCon 2017: "constexpr ALL the Things"</a></li>
+            <li> <a href="https://www.youtube.com/watch?v=JXJg_XMJFW0">C++ Weekly Ep 159 - 'constexpr' 'virtual' Members in C++20</a></li>
+          </ul>
+        </section>
+        <section>
+          <h1> Thank you! </h1>
+        </section>
+
+        <!--
+				<section>
+          <h3>Rust is fast!</h3>
+          <p> <a href="https://benchmarksgame-team.pages.debian.net/benchmarksgame/faster/rust.html"><img src="img/fast.png" height=600px /></a></p>
+        </section>
+        <section>
+          <section> <h1> Let's write some code </h1></section>
+          <section>
+            <h3> Variables & Mutability</h3>
+              <p> By default all variables are immutable</p>
+                <pre class="rust fragment"><code>
+  fn main() {
+      let x = 9;
+      println!("Votes for Baguette: {}", x);
+      x = 4;
+      println!("Votes for Aquarium: {}", x);
+  }
+              </code></pre>
+                <pre class="bash fragment"><code>
+error[E0384]: cannot assign twice to immutable variable `x`
+ - - > src/main.rs:4:5
+ (...)
+              </code></pre>
+          </section>
+          <section>
+            <h3> Variables & Mutability</h3>
+            <p> To modify value, you must mark it as mutable</p>
+                <pre class="rust fragment"><code>
+  fn main() {
+      let mut x = 9;
+      println!("Votes for Baguette: {}", x);
+      x = 4;
+      println!("Votes for Aquarium: {}", x);
+  }
+              </code></pre>
+          </section>
+          <section>
+            <h3> Const vs Mutable</h3>
+            <ul>
+              <li class="fragment"> You aren’t allowed to use mut with constants.</li>
+              <li class="fragment"> The value must be annotated </li>
+              <li class="fragment"> Can be declared at any scope </li>
+              <li class="fragment"> May be set only to a constant expression, not the result of a function (or any runtime value) </li>
+            </ul>
+
+            <pre class="rust fragment"><code>
+const MAX_POINTS: u32 = 100_000;
+              </code></pre>
+          </section>
+          <section>
+            <h3> Shadowing</h3>
+            <p> As in other languages, user can shadow variable </p>
+            <pre class="rust fragment"><code>
+fn main() {
+    let x = 5;
+    let x = x + 1;
+    let x = x * 2;
+
+    println!("The value of x is: {}", x);
+}
+              </code></pre>
+          </section>
+          <section>
+            <h3> Types </h3>
+            <p> Rust is statically typed language. All types must be known at compile time</p>
+            <pre class="rust fragment"><code>
+let guess = "42".parse().expect("Not a number!");
+              </code></pre>
+            <pre class="bash fragment"><code>
+error[E0282]: type annotations needed
+ - - > src/main.rs:2:9
+  |
+2 |     let guess = "42".parse().expect("Not a number!");
+  |         ^^^^^
+  |         |
+  |         cannot infer type for `_`
+  |         consider giving `guess` a type
+              </code></pre>
+            <pre class="rust fragment"><code>
+let guess: u32 = "42".parse().expect("Not a number!");
+              </code></pre>
+          </section>
+          <section>
+            <h3>Integer Types </h3>
+            <p> <img src="img/types.png"/></p>
+          </section>
+          <section>
+            <h3> Declaring types</h3>
+            <p> <img src="img/types2.png"/></p>
+          </section>
+          <section>
+            <h3> Overflows</h3>
+            <p class="fragment"> In debug mode, overflow will end up with panic</p>
+            <p class="fragment"> In release mode, overflow will wrap value around</p>
+          </section>
+          <section>
+            <h3> Other types... </h3>
+            <p class="fragment"> f32, f64, boolean, character...</p>
+          </section>
+          <section>
+            <h3> Compound Types</h3>
+            <p class="fragment"> In rust we have two compund types: tuples and arrays</p>
+            <pre class="rust fragment"><code>
+fn main() {
+    let tup: (i32, f64, u8) = (500, 6.4, 1);
+}
+              </code></pre>
+          </section>
+          <section>
+            <h3> Compound Types</h3>
+            <p class=""> In rust we have two compund types: tuples and arrays</p>
+            <pre class="rust "><code>
+let a: [i32; 5] = [1, 2, 3, 4, 5];
+              </code></pre>
+          </section>
+          <section>
+            <h3> Structs </h3>
+            <p class="fragment"> Structure of a structure</p>
+            <pre class="rust fragment"><code>
+struct User {
+    username: String,
+    email: String,
+    sign_in_count: u64,
+    active: bool,
+}
+              </code></pre>
+            <pre class="rust fragment"><code>
+let user1 = User {
+    email: String::from("someone@example.com"),
+    username: String::from("someusername123"),
+    active: true,
+    sign_in_count: 1,
+};
+              </code></pre>
+          </section>
+          <section>
+            <h3> Structs </h3>
+            <p class="fragment"> You cannot have default values </p>
+            <pre class="rust fragment"><code>
+fn build_user(email: String, username: String) -> User {
+    User {
+        email: email,
+        username: username,
+        active: true,
+        sign_in_count: 1,
+    }
+}
+              </code></pre>
+          </section>
+          <section>
+            <h3> Structs </h3>
+            <p class="fragment"> You can create structs as tuples</p>
+            <pre class="rust fragment"><code>
+struct Color(i32, i32, i32);
+struct Point(i32, i32, i32);
+
+let black = Color(0, 0, 0);
+let origin = Point(0, 0, 0);
+              </code></pre>
+          </section>
+          <section>
+            <h3> Methods </h3>
+            <pre class="rust fragment"><code>
+#[derive(Debug)]
+struct Rectangle {
+    width: u32,
+    height: u32,
+}
+
+impl Rectangle {
+    fn area(&self) -> u32 {
+        self.width * self.height
+    }
+}
+
+fn main() {
+    let rect1 = Rectangle { width: 30, height: 50 };
+
+    println!(
+        "The area of the rectangle is {} square pixels.",
+        rect1.area()
+    );
+}
+              </code></pre>
+          </section>
+          <section>
+            <h3> Traits </h3>
+            <pre class="rust fragment"><code>
+pub trait Summary {
+    fn summarize(&self) -> String;
+}
+              </code></pre>
+            <pre class="rust fragment"><code>
+pub struct NewsArticle {
+    pub headline: String,
+    pub location: String,
+    pub author: String,
+    pub content: String,
+}
+
+impl Summary for NewsArticle {
+    fn summarize(&self) -> String {
+        format!("{}, by {} ({})", self.headline, self.author, self.location)
+    }
+}
+              </code></pre>
+          </section>
+        </section>
+        <section>
+          <h1> Questions? </h1>
+        </section>
+        <section>
+          <h1> Thank you! </h1>
+        </section>
+        -->
+			</div>
+		</div>
+
+		<script src="../reveal.js/lib/js/head.min.js"></script>
+		<script src="../reveal.js/js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+				dependencies: [
+					{ src: '../reveal.js/plugin/markdown/marked.js' },
+					{ src: '../reveal.js/plugin/markdown/markdown.js' },
+					{ src: '../reveal.js/plugin/notes/notes.js', async: true },
+					{ src: '../reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+		</script>
+	</body>
+</html>
