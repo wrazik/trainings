@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<title>constexpr-land</title>
+	    <title>constexpr-land</title>
 
 		<link rel="stylesheet" href="../reveal.js/css/reveal.css">
 		<link rel="stylesheet" href="../reveal.js/css/theme/league.css">
@@ -34,15 +34,44 @@
 					</p>
         </section>
         <section>
-          <h2>constexpr<h2>
-              <p> constexpr keyword was added to C++11</p>
-              <p> In C++ only allowed construction were: </p>
+          <h2> constexpr </h2>
+              <p> constexpr keyword was added to C++11 </p>
+              <p> this specifier means that function or variable can be evaluated at compile time</p>
+        </section>
+        <section>
+          <h2> C++11 </h2>
+              <p> The function body must be deleted, defaulted or contain only the following:</p>
               <ul> 
-                <li> Single return statement</li>
+                <li> null statements </li>
+
+                <pre class="code fragment"><code>
+constexpr void foo() = delete;
+constexpr Foo::Foo() = default;
+constexpr void foo() {
+    ;
+    ;;                        
+}
+                  </code></pre>
+                  </ul>
+              </section>
+          <section>
+              <h2> C++11 </h2>
+                  <p> The function body must be deleted, defaulted or contain only the following:</p>
+                  <ul> 
+                    <li> static_assert </li>
+                 </ui>
+        </section>
+        <section>
+          <h2> C++11 </h2>
+              <p> ... function body must not contain </p>
+              <ul>
+                  <li> asm declarations</li>
+                  <li> asm declarations</li>
               </ul>
         </section>
         <section>
           <h2>C++11<h2>
+          <p> 
         </section>
         <section>
           <h2>C++14<h2>
@@ -50,17 +79,26 @@
         <section>
           <h2>C++17<h2>
               <p> constexpr lambda</p>
+              <p> if constexpr </p>
+              <p constexpr inline variables</p> 
         </section>
         <section>
           <h2>C++20<h2>
               <p> constexpr virtual</p>
+<p> constexpr containers: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p0784r5.html</p>
         </section>
         <section>
           <h2>constexpr types<h2>
         </section>
         <section>
           <h2>constexpr new/delete<h2>
+<p> try/catch</p>
+<p> function try/catch </p>
+<p> </p>
         </section>
+        <section>
+   
+        </section> 
         <section>
           <h2>limitations<h2>
               <p> non-trivial_destructor</p>
