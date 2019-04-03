@@ -37,14 +37,41 @@
           <h2> constexpr </h2>
               <p> constexpr keyword was added to C++11 </p>
               <p> this specifier means that function or variable can be evaluated at compile time</p>
+              <p> ... but it doesn't mean that it <b>must</b> be evaluated at compile time</p>
+        </section>
+        <section>
+                <pre class="code"><code>
+constexpr int foo(const int i) {
+  return i*i;
+}
+
+int main(int argc, char** argv) {
+  static_assert(foo(5) == 25); // OK
+  foo(argc); // OK
+}
+                </code></pre>
+        </section>
+        <section>
+                <pre class="code"><code>
+constexpr int foo(const int i) {
+  const int x {42}; // Error in C++11, even though
+                    // not called in constexpr context
+  return x*i;
+}
+
+int main(int argc, char** argv) {
+  foo(argc);
+}
+                </code></pre>
         </section>
         <section>
           <h2> C++11 </h2>
-              <p> The function body must be deleted, defaulted or contain only the following:</p>
-              <ul> 
-                <li> null statements </li>
-
-                <pre class="code fragment"><code>
+              <p> In C++11, we have only <i>whitelist</i> of statements that are allowed in constant time context</p>
+              <ul> Allowed:
+                <li> function can be deleted or defaulted
+                <li> may contain null statements </li>
+              </ul>
+                <pre class="code"><code>
 constexpr void foo() = delete;
 constexpr Foo::Foo() = default;
 constexpr void foo() {
@@ -52,20 +79,60 @@ constexpr void foo() {
     ;;                        
 }
                   </code></pre>
-                  </ul>
               </section>
           <section>
               <h2> C++11 </h2>
-                  <p> The function body must be deleted, defaulted or contain only the following:</p>
                   <ul> 
                     <li> static_assert </li>
-                 </ui>
+                  </ul>
+
+                <pre class="code"><code>
+constexpr void foo() {
+  static_assert(sizeof(short int) == sizeof(int));
+  static_assert(sizeof(int) == sizeof(long int));
+}
+                </code></pre>
+        </section>
+        <section>
+              <h2> C++11 </h2>
+                  <ul> 
+                    <li> typedefs and alias declarations that do not define classes or enumarations </li>
+                  </ul>
+
+                <pre class="code"><code>
+constexpr void foo() {
+  typedef std::string string; // typedef sucks!
+}
+                </code></pre>
+        </section>
+        <section>
+              <h2> C++11 </h2>
+                  <ul> 
+                    <li> using declarations and using directives </li>
+                  </ul>
+
+                <pre class="code"><code>
+constexpr void foo() {
+  static_assert(sizeof(int) == 8);
+}
+                </code></pre>
+        </section>
+        <section>
+              <h2> C++11 </h2>
+                  <ul> 
+                    <li> exatly one return statement</li>
+                  </ul>
+
+                <pre class="code"><code>
+constexpr void foo() {
+  static_assert(sizeof(int) == 8);
+}
+                </code></pre>
         </section>
         <section>
           <h2> C++11 </h2>
               <p> ... function body must not contain </p>
               <ul>
-                  <li> asm declarations</li>
                   <li> asm declarations</li>
               </ul>
         </section>
