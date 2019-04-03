@@ -81,10 +81,7 @@ constexpr void foo() {
                   </code></pre>
               </section>
           <section>
-              <h2> C++11 </h2>
-                  <ul> 
-                    <li> static_assert </li>
-                  </ul>
+<p> static_assert </p>
 
                 <pre class="code"><code>
 constexpr void foo() {
@@ -92,28 +89,28 @@ constexpr void foo() {
   static_assert(sizeof(int) == sizeof(long int));
 }
                 </code></pre>
-        </section>
-        <section>
-              <h2> C++11 </h2>
-                  <ul> 
-                    <li> typedefs and alias declarations that do not define classes or enumarations </li>
-                  </ul>
+<p> typedefs and alias declarations that do not define classes or enumarations </p>
 
                 <pre class="code"><code>
 constexpr void foo() {
-  typedef std::string string; // typedef sucks!
+  typedef std::string string; // OK, but typedef sucks!
+  template
+  using MyType = some::fancy_namespace::Type; // Ok
+}
+                </code></pre>
+                <pre class="code"><code>
+constexpr void foo() {
+  typedef struct Foo {} f; // Error, typedef still sucks
 }
                 </code></pre>
         </section>
         <section>
-              <h2> C++11 </h2>
-                  <ul> 
-                    <li> using declarations and using directives </li>
-                  </ul>
-
+<p> using declarations and using directives </p>
                 <pre class="code"><code>
 constexpr void foo() {
-  static_assert(sizeof(int) == 8);
+  using namespace std; // using-directive, Ok, but don't do that
+  using some::fancy_namespace::Foo; // using-declaration, OK
+
 }
                 </code></pre>
         </section>
