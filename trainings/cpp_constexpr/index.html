@@ -68,7 +68,8 @@ int main(int argc, char** argv) {
           <h2> C++11 </h2>
               <p> In C++11, we have only <i>whitelist</i> of statements that are allowed in constant time context</p>
               <ul> Allowed:
-                <li> function can be deleted or defaulted
+                <li> function can be deleted </li>
+                <li> special members can be defaulted </li>
                 <li> may contain null statements </li>
               </ul>
                 <pre class="code"><code>
@@ -94,8 +95,7 @@ constexpr void foo() {
                 <pre class="code"><code>
 constexpr void foo() {
   typedef std::string string; // OK, but typedef sucks!
-  template
-  using MyType = some::fancy_namespace::Type; // Ok
+  using MyType = some::fancy_namespace::Type<int>; // Ok
 }
                 </code></pre>
                 <pre class="code"><code>
@@ -115,27 +115,28 @@ constexpr void foo() {
                 </code></pre>
         </section>
         <section>
-              <h2> C++11 </h2>
                   <ul> 
-                    <li> exatly one return statement</li>
+                    <li> exactly one return statement</li>
                   </ul>
 
                 <pre class="code"><code>
-constexpr void foo() {
-  static_assert(sizeof(int) == 8);
+
+constexpr int Fib(int n) {
+  return n < 2 ? 1 : Fib(n-1) + Fib(n-2);
+}
+
+int main() {
+  static_assert(Fib(6) == 13);
 }
                 </code></pre>
         </section>
         <section>
-          <h2> C++11 </h2>
-              <p> ... function body must not contain </p>
-              <ul>
-                  <li> asm declarations</li>
-              </ul>
+          <h2> C++14 </h2>
+            <p> Since C++14, we have black list statements *not* allowed in constexpr context</p>
+
         </section>
         <section>
-          <h2>C++11<h2>
-          <p> 
+          <p> </p>
         </section>
         <section>
           <h2>C++14<h2>
