@@ -75,12 +75,9 @@
             </ul>
         </section>
         <section>
-            <p> Quiz: is this struct trivially destructible?</p>
+           <h2> Quiz </h2>
+           <p> Is this class trivially destructible?</p>
                 <pre class="code"><code>struct Foo {
-  int i;
-};
-                </code></pre>
-                <pre class="code fragment"><code>struct Foo {
   int i;
   ~Foo() = default;
 };
@@ -90,10 +87,7 @@
   ~Foo() {}
 };
                 </code></pre>
-        </section>
-        <section>
-            <p> Quiz: is this struct trivially destructible?</p>
-                <pre class="code"><code>struct Foo {
+                <pre class="code fragment"><code>struct Foo {
   int i;
   ~Foo();
 };
@@ -107,15 +101,14 @@ Foo::~Foo() = default;
 struct Bar {
   ~Bar() {};
 };
-struct Biz {
-  ~Biz();
+struct FooBar {
+  ~FooBar();
 };
-Biz::~Biz() = default;
-
+FooBar::~FooBar() = default;
 int main() {
-  constexpr Foo foo{};    // OK
-  constexpr Bar bar{};    // Error, non-trivial destructor
-  constexpr Biz biz{};    // Error, non-trivial destructor
+  constexpr Foo f{};    // OK
+  constexpr Bar b{};    // Error, non-trivial destructor
+  constexpr FooBar b{}; // Error, non-trivial destructor
 }
                 </code></pre>
         </section>
@@ -130,7 +123,7 @@ int main() {
                 <p class="fragment"> Yes, but only for objects with static storage duration</p>
                 <pre class="code fragment"><code>int main() {
   static constexpr int i = 42;
-  constexpr const int&amp; j = i; // OK
+  constexpr const int& j = i; // OK
 }
                 </code></pre>
         </section>
@@ -182,6 +175,7 @@ constexpr void foo() {
               </section>
           <section>
 <p> static_assert </p>
+
                 <pre class="code"><code>
 constexpr void foo() {
   static_assert(sizeof(short int) == sizeof(int));
@@ -208,15 +202,11 @@ constexpr void foo() {
 constexpr void foo() {
   using namespace std; // using-directive, Ok, but don't do that
   using some::fancy_namespace::Foo; // using-declaration, OK
-
 }
                 </code></pre>
         </section>
         <section>
-                  <ul> 
-                    <li> exactly one return statement</li>
-                  </ul>
-
+            <p> exactly one return statement</p>
                 <pre class="code"><code>
 constexpr int Fib(int n) {
   return n &lt; 2 ? 1 : Fib(n-1) + Fib(n-2);
@@ -224,27 +214,22 @@ constexpr int Fib(int n) {
 
 int main() {
   static_assert(Fib(6) == 13);
-}
-                </code></pre>
+}</code></pre>
         </section>
         <section>
-        <section>
-           <p> In C++11, constexpr in non-static member function implies const </p>
-           <p> constexpr in a function implies inline </p>
-        </section>
-           <h3> C++11 Constructors </h3>
-           <p> The constructor body must be deleted, defaulted or contain only:</p>
-           <p> .... same stuff as function, except "single return statement"</p>
+           <h3> Constructors</h3>
+           <p> Each of it's parameters must be Literal Type
+           <p> The class must not have virtual base classes </p>
+           <p> Can be defaulted, deleted </p>
+           <p> The same constraints as for constexpr function, except single return statement </p>
         </section>
         <section>
-          <h1> C++14 </h1>
         </section>
         <section>
-          <p> variables </p> 
-          <p> ... same requirements as in C++11 </p> 
         </section>
-            <h3> functions </h3>
-            <p> Since C++14, we have black list statements <b>not</b> allowed in constexpr functions</p>
+        <section>
+          <h2> C++14 </h2>
+            <p> Since C++14, we have black list statements <b>not</b> allowed in constexpr context</p>
         </section>
         <section>
           <p> </p>
@@ -256,7 +241,7 @@ int main() {
           <h2>C++17<h2>
               <p> constexpr lambda</p>
               <p> if constexpr </p>
-              <p> constexpr inline variables </p> 
+              <p constexpr inline variables</p> 
         </section>
         <section>
           <h2>C++20<h2>
