@@ -34,12 +34,109 @@
 					</p>
         </section>
         <section>
-          <h2> constexpr </h2>
-              <p> constexpr keyword was added to C++11 </p>
-              <p> this specifier means that function or variable can be evaluated at compile time</p>
-              <p> ... but it doesn't mean that it <b>must</b> be evaluated at compile time</p>
+          <h3> C++ is awesome! </h3>
+          <p> You can learn it for many years and it will still suprise you!</p> 
+          <img class="fragment" src="img/effective.png" height=400px/>
         </section>
         <section>
+          <h2> constexpr </h2>
+              <p> It's just a keyword that means that something can be evaluated in constant time </p>
+              <p> But even though it looks simple it still may suprise some C++ devs!</p>
+        </section>
+        <section>
+          <h2> constexpr </h2>
+              <p> constexpr keyword was added to C++11 </p>
+              <p> standard distinguish constexpr in three different places:</p>
+              <ul class="fragment"> 
+                <li> variable </li>
+                <li> function </li>
+                <li> constructor </li>
+              </ul>
+              <p class="fragment"> there is also if constexpr, and metaclass proposal from Herb Sutter with constexpr block </p>
+        </section>
+        <section>
+            <h1> C++11 </h1>
+        </section>
+        <section>
+            <h2> variables </h2>
+            <p> must be Literal Type </p> 
+            <p> ... what does it mean? </p> 
+        </section>
+        <section>
+            <h2> Literal Type </h2>
+            <p>  Literal types are the types of constexpr variable and they can be constructed, manipulated and returned from constexpr function:</p>
+            <ul> 
+                <li>scalar, reference, array of literal type </li> 
+                <li>any cv-qualified class type that has: </li> 
+                <ul> 
+                    <li> has a trivial destructor </li> 
+                    <li> is either an aggregate type or has a constexpr constructor</li> 
+                </ul>
+            </ul>
+        </section>
+        <section>
+            <p> Quiz: is this struct trivially destructible?</p>
+                <pre class="code"><code>struct Foo {
+  int i;
+};
+                </code></pre>
+                <pre class="code fragment"><code>struct Foo {
+  int i;
+  ~Foo() = default;
+};
+                </code></pre>
+                <pre class="code fragment"><code>struct Foo {
+  int i;
+  ~Foo() {}
+};
+                </code></pre>
+        </section>
+        <section>
+            <p> Quiz: is this struct trivially destructible?</p>
+                <pre class="code"><code>struct Foo {
+  int i;
+  ~Foo();
+};
+Foo::~Foo() = default;
+                </code></pre>
+        </section>
+        <section>
+                <pre class="code"><code>struct Foo {
+  ~Foo() = default;
+};
+struct Bar {
+  ~Bar() {};
+};
+struct Biz {
+  ~Biz();
+};
+Biz::~Biz() = default;
+
+int main() {
+  constexpr Foo foo{};    // OK
+  constexpr Bar bar{};    // Error, non-trivial destructor
+  constexpr Biz biz{};    // Error, non-trivial destructor
+}
+                </code></pre>
+        </section>
+        <section>
+          <p> ...wait, constexpr reference?</p>
+                <pre class="code"><code>int main() {
+  constexpr int i = 42;
+  constexpr const int&amp; j = i; 
+  // Error, 'i' is  not a constant expression
+}
+                </code></pre>
+                <p class="fragment"> Yes, but only for objects with static storage duration</p>
+                <pre class="code fragment"><code>int main() {
+  static constexpr int i = 42;
+  constexpr const int&amp; j = i; // OK
+}
+                </code></pre>
+        </section>
+        <section>
+            <h3> function </h3>
+              <p> constexpr function doesn't have to be evaluated at compile time</p>
                 <pre class="code"><code>
 constexpr int foo(const int i) {
   return i*i;
@@ -52,6 +149,7 @@ int main(int argc, char** argv) {
                 </code></pre>
         </section>
         <section>
+<p> even if it's not used in constexpr context <b>anywhere</b>, it can't contain expression that can't be evaluated at compile time* </p>
                 <pre class="code"><code>
 constexpr int foo(const int i) {
   const int x {42}; // Error in C++11, even though
@@ -63,10 +161,11 @@ int main(int argc, char** argv) {
   foo(argc);
 }
                 </code></pre>
+
         </section>
         <section>
-          <h2> C++11 </h2>
-              <p> In C++11, we have only <i>whitelist</i> of statements that are allowed in constant time context</p>
+          <p> constexpr function can take only LiteralType arguments, and can return only LiteralType value </p>
+          <p> In C++11, we have <i>whitelist</i> of statements that are allowed in constant time context</p>
               <ul> Allowed:
                 <li> function can be deleted </li>
                 <li> special members can be defaulted </li>
@@ -83,7 +182,6 @@ constexpr void foo() {
               </section>
           <section>
 <p> static_assert </p>
-
                 <pre class="code"><code>
 constexpr void foo() {
   static_assert(sizeof(short int) == sizeof(int));
@@ -95,7 +193,7 @@ constexpr void foo() {
                 <pre class="code"><code>
 constexpr void foo() {
   typedef std::string string; // OK, but typedef sucks!
-  using MyType = some::fancy_namespace::Type<int>; // Ok
+  using MyType = some::fancy_namespace::Type&lt;int&gt;; // Ok
 }
                 </code></pre>
                 <pre class="code"><code>
@@ -120,9 +218,8 @@ constexpr void foo() {
                   </ul>
 
                 <pre class="code"><code>
-
 constexpr int Fib(int n) {
-  return n < 2 ? 1 : Fib(n-1) + Fib(n-2);
+  return n &lt; 2 ? 1 : Fib(n-1) + Fib(n-2);
 }
 
 int main() {
@@ -131,9 +228,23 @@ int main() {
                 </code></pre>
         </section>
         <section>
-          <h2> C++14 </h2>
-            <p> Since C++14, we have black list statements *not* allowed in constexpr context</p>
-
+        <section>
+           <p> In C++11, constexpr in non-static member function implies const </p>
+           <p> constexpr in a function implies inline </p>
+        </section>
+           <h3> C++11 Constructors </h3>
+           <p> The constructor body must be deleted, defaulted or contain only:</p>
+           <p> .... same stuff as function, except "single return statement"</p>
+        </section>
+        <section>
+          <h1> C++14 </h1>
+        </section>
+        <section>
+          <p> variables </p> 
+          <p> ... same requirements as in C++11 </p> 
+        </section>
+            <h3> functions </h3>
+            <p> Since C++14, we have black list statements <b>not</b> allowed in constexpr functions</p>
         </section>
         <section>
           <p> </p>
@@ -145,7 +256,7 @@ int main() {
           <h2>C++17<h2>
               <p> constexpr lambda</p>
               <p> if constexpr </p>
-              <p constexpr inline variables</p> 
+              <p> constexpr inline variables </p> 
         </section>
         <section>
           <h2>C++20<h2>
@@ -159,6 +270,7 @@ int main() {
           <h2>constexpr new/delete<h2>
 <p> try/catch</p>
 <p> function try/catch </p>
+<p> is_constant_evaluated </p>
 <p> </p>
         </section>
         <section>
@@ -183,227 +295,14 @@ int main() {
           <ul>
             <li> <a href="https://www.youtube.com/watch?v=PJwd4JLYJJY">CppCon 2017: "constexpr ALL the Things"</a></li>
             <li> <a href="https://www.youtube.com/watch?v=JXJg_XMJFW0">C++ Weekly Ep 159 - 'constexpr' 'virtual' Members in C++20</a></li>
+            <li> <a href="https://en.cppreference.com/w/cpp/language/constexpr"> cppreference.com </a></li>
+            <li> <a href="https://stackoverflow.com/questions/28614591/how-to-initialize-a-constexpr-reference"> stackoverflow.com </a></li>
           </ul>
         </section>
         <section>
           <h1> Thank you! </h1>
         </section>
 
-        <!--
-				<section>
-          <h3>Rust is fast!</h3>
-          <p> <a href="https://benchmarksgame-team.pages.debian.net/benchmarksgame/faster/rust.html"><img src="img/fast.png" height=600px /></a></p>
-        </section>
-        <section>
-          <section> <h1> Let's write some code </h1></section>
-          <section>
-            <h3> Variables & Mutability</h3>
-              <p> By default all variables are immutable</p>
-                <pre class="rust fragment"><code>
-  fn main() {
-      let x = 9;
-      println!("Votes for Baguette: {}", x);
-      x = 4;
-      println!("Votes for Aquarium: {}", x);
-  }
-              </code></pre>
-                <pre class="bash fragment"><code>
-error[E0384]: cannot assign twice to immutable variable `x`
- - - > src/main.rs:4:5
- (...)
-              </code></pre>
-          </section>
-          <section>
-            <h3> Variables & Mutability</h3>
-            <p> To modify value, you must mark it as mutable</p>
-                <pre class="rust fragment"><code>
-  fn main() {
-      let mut x = 9;
-      println!("Votes for Baguette: {}", x);
-      x = 4;
-      println!("Votes for Aquarium: {}", x);
-  }
-              </code></pre>
-          </section>
-          <section>
-            <h3> Const vs Mutable</h3>
-            <ul>
-              <li class="fragment"> You aren’t allowed to use mut with constants.</li>
-              <li class="fragment"> The value must be annotated </li>
-              <li class="fragment"> Can be declared at any scope </li>
-              <li class="fragment"> May be set only to a constant expression, not the result of a function (or any runtime value) </li>
-            </ul>
-
-            <pre class="rust fragment"><code>
-const MAX_POINTS: u32 = 100_000;
-              </code></pre>
-          </section>
-          <section>
-            <h3> Shadowing</h3>
-            <p> As in other languages, user can shadow variable </p>
-            <pre class="rust fragment"><code>
-fn main() {
-    let x = 5;
-    let x = x + 1;
-    let x = x * 2;
-
-    println!("The value of x is: {}", x);
-}
-              </code></pre>
-          </section>
-          <section>
-            <h3> Types </h3>
-            <p> Rust is statically typed language. All types must be known at compile time</p>
-            <pre class="rust fragment"><code>
-let guess = "42".parse().expect("Not a number!");
-              </code></pre>
-            <pre class="bash fragment"><code>
-error[E0282]: type annotations needed
- - - > src/main.rs:2:9
-  |
-2 |     let guess = "42".parse().expect("Not a number!");
-  |         ^^^^^
-  |         |
-  |         cannot infer type for `_`
-  |         consider giving `guess` a type
-              </code></pre>
-            <pre class="rust fragment"><code>
-let guess: u32 = "42".parse().expect("Not a number!");
-              </code></pre>
-          </section>
-          <section>
-            <h3>Integer Types </h3>
-            <p> <img src="img/types.png"/></p>
-          </section>
-          <section>
-            <h3> Declaring types</h3>
-            <p> <img src="img/types2.png"/></p>
-          </section>
-          <section>
-            <h3> Overflows</h3>
-            <p class="fragment"> In debug mode, overflow will end up with panic</p>
-            <p class="fragment"> In release mode, overflow will wrap value around</p>
-          </section>
-          <section>
-            <h3> Other types... </h3>
-            <p class="fragment"> f32, f64, boolean, character...</p>
-          </section>
-          <section>
-            <h3> Compound Types</h3>
-            <p class="fragment"> In rust we have two compund types: tuples and arrays</p>
-            <pre class="rust fragment"><code>
-fn main() {
-    let tup: (i32, f64, u8) = (500, 6.4, 1);
-}
-              </code></pre>
-          </section>
-          <section>
-            <h3> Compound Types</h3>
-            <p class=""> In rust we have two compund types: tuples and arrays</p>
-            <pre class="rust "><code>
-let a: [i32; 5] = [1, 2, 3, 4, 5];
-              </code></pre>
-          </section>
-          <section>
-            <h3> Structs </h3>
-            <p class="fragment"> Structure of a structure</p>
-            <pre class="rust fragment"><code>
-struct User {
-    username: String,
-    email: String,
-    sign_in_count: u64,
-    active: bool,
-}
-              </code></pre>
-            <pre class="rust fragment"><code>
-let user1 = User {
-    email: String::from("someone@example.com"),
-    username: String::from("someusername123"),
-    active: true,
-    sign_in_count: 1,
-};
-              </code></pre>
-          </section>
-          <section>
-            <h3> Structs </h3>
-            <p class="fragment"> You cannot have default values </p>
-            <pre class="rust fragment"><code>
-fn build_user(email: String, username: String) -> User {
-    User {
-        email: email,
-        username: username,
-        active: true,
-        sign_in_count: 1,
-    }
-}
-              </code></pre>
-          </section>
-          <section>
-            <h3> Structs </h3>
-            <p class="fragment"> You can create structs as tuples</p>
-            <pre class="rust fragment"><code>
-struct Color(i32, i32, i32);
-struct Point(i32, i32, i32);
-
-let black = Color(0, 0, 0);
-let origin = Point(0, 0, 0);
-              </code></pre>
-          </section>
-          <section>
-            <h3> Methods </h3>
-            <pre class="rust fragment"><code>
-#[derive(Debug)]
-struct Rectangle {
-    width: u32,
-    height: u32,
-}
-
-impl Rectangle {
-    fn area(&self) -> u32 {
-        self.width * self.height
-    }
-}
-
-fn main() {
-    let rect1 = Rectangle { width: 30, height: 50 };
-
-    println!(
-        "The area of the rectangle is {} square pixels.",
-        rect1.area()
-    );
-}
-              </code></pre>
-          </section>
-          <section>
-            <h3> Traits </h3>
-            <pre class="rust fragment"><code>
-pub trait Summary {
-    fn summarize(&self) -> String;
-}
-              </code></pre>
-            <pre class="rust fragment"><code>
-pub struct NewsArticle {
-    pub headline: String,
-    pub location: String,
-    pub author: String,
-    pub content: String,
-}
-
-impl Summary for NewsArticle {
-    fn summarize(&self) -> String {
-        format!("{}, by {} ({})", self.headline, self.author, self.location)
-    }
-}
-              </code></pre>
-          </section>
-        </section>
-        <section>
-          <h1> Questions? </h1>
-        </section>
-        <section>
-          <h1> Thank you! </h1>
-        </section>
-        -->
 			</div>
 		</div>
 
