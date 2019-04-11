@@ -123,9 +123,17 @@ int main() {
                 <p class="fragment"> Yes, but only for objects with static storage duration</p>
                 <pre class="code fragment"><code>int main() {
   static constexpr int i = 42;
-  constexpr const int& j = i; // OK
+  constexpr const int&amp; j = i; // OK
 }
                 </code></pre>
+        </section>
+        <section>
+           <p> Constexpr in object declaration implies const <p>
+            <pre class="code"><code>int main() {
+  constexpr int i {2};
+  static_assert(std::is_same&lt;const int, decltype(i)&gt;::value);
+  static_assert(std::is_same&lt;int, decltype(i)&gt;::value); // Error
+}</code></pre>
         </section>
         <section>
             <h3> function </h3>
@@ -217,6 +225,11 @@ int main() {
 }</code></pre>
         </section>
         <section>
+          <p> Note: </p>
+          <p> constexpr specifier used in a function implies inline</p>
+          <img src="img/godbolt.png"/>
+        </section>
+        <section>
            <h3> Constructors</h3>
            <p> Each of it's parameters must be Literal Type
            <p> The class must not have virtual base classes </p>
@@ -224,15 +237,32 @@ int main() {
            <p> The same constraints as for constexpr function, except single return statement </p>
         </section>
         <section>
+          <h1> C++14 </h1>
         </section>
         <section>
+            <h2> variables </h2>
+            <p> constexpr variables has the same requirements as in C++11 </p>
         </section>
         <section>
-          <h2> C++14 </h2>
+          <h2> functions </h2>
             <p> Since C++14, we have black list statements <b>not</b> allowed in constexpr context</p>
         </section>
         <section>
-          <p> </p>
+            <p> constexpr function in C++14 must <b>not</b> contain: </p>
+            <p class="fragment"> assembly block</p>
+                <pre class="code fragment"><code>constexpr int foo(int n) {
+  asm("movq $60, %rax\n\t" 
+      "movq $2,  %rdi\n\t"
+      "syscall"); // Not compiling
+} </code></pre>
+            <p class="fragment"> goto statements </p>
+                <pre class="code fragment"><code>constexpr int foo(int n) {
+  if (n == 2) 
+    goto error; //goto sucks more than typedef
+  bar(n);
+error:
+    make_cleanup();
+}</code></pre>
         </section>
         <section>
           <h2>C++14<h2>
