@@ -255,7 +255,7 @@ int main() {
       "movq $2,  %rdi\n\t"
       "syscall"); // Not compiling
 } </code></pre>
-            <p class="fragment"> goto statements </p>
+            <p class="fragment"> goto statements or label different than case and default</p>
                 <pre class="code fragment"><code>constexpr int foo(int n) {
   if (n == 2) 
     goto error; //goto sucks more than typedef
@@ -265,13 +265,42 @@ error:
 }</code></pre>
         </section>
         <section>
-          <h2>C++14<h2>
+            <p class="fragment"> try-block </p>
+                <pre class="code fragment"><code>constexpr int foo(int n) {
+  try {
+    foo();
+  }
+  catch(const std::exception&amp; e) {
+    std::cout &lt;&lt; "Error: " &lt;&lt; e.what() &lt;&lt; "\n";
+  }
+}</code></pre>
+        </section>
+        <section>
+            <p class="fragment"> try-block </p>
+                <pre class="code fragment"><code>constexpr int foo(int n) {
+  try {
+    foo();
+  }
+  catch(const std::exception&amp; e) {
+    std::cout &lt;&lt; "Error: " &lt;&lt; e.what() &lt;&lt; "\n";
+  }
+}</code></pre>
+        </section>
+        <section>
+           <p> definition of a variable of non-literal-type <p>
+           <p> definition of static or thread storage duration <p>
+           <p> a definition of variable for which no initialization is performed <p>
+        </section>
+        <section>
+          
         </section>
         <section>
           <h2>C++17<h2>
               <p> constexpr lambda</p>
-              <p> if constexpr </p>
-              <p constexpr inline variables</p> 
+              <p> if constexpr -alexandrescu talk
+https://brevzin.github.io/c++/2019/01/15/if-constexpr-isnt-broken/
+https://www.youtube.com/watch?v=tcyb1lpEHm0 </p>
+              <p> constexpr inline variables</p> 
         </section>
         <section>
           <h2>C++20<h2>
@@ -292,15 +321,19 @@ error:
    
         </section> 
         <section>
-          <h2>limitations<h2>
-              <p> non-trivial_destructor</p>
-              <p> debugging </p>
-        </section>
-        <section>
           <h2>exceptions<h2>
         </section>
         <section>
           <h2>Compilation<h2>
+        </section>
+        <section>
+          <h2> Summary <h2>
+<ul>
+          <li> With newer versions of the standard constexpr has more and more support </li>
+          <li> We should almost always preffer compile-time computations - they are done only once! </li>
+          <li> If a function may have to be evaluated at compile time, declare it constexpr </li>
+          <li> </li>
+</ul>
         </section>
         <section>
           <h1> Questions? </h1>
