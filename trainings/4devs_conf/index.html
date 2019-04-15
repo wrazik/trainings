@@ -1,0 +1,253 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	    <title>4developers conference</title>
+
+		<link rel="stylesheet" href="../reveal.js/css/reveal.css">
+		<link rel="stylesheet" href="../reveal.js/css/theme/league.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="../reveal.js/lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? '../reveal.js/css/print/pdf.css' : '../reveal.js/css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+            <section>
+                <h2> 4Developers conference</h2>
+                <p> trip report from C++ track </p>
+                <p>
+                    <small>wrazik, 08.04.2019</small>
+                </p>
+            </section>
+            <section>
+             <h3> Informations </h3>
+             <p> Conference took place on 08.04.2019</p>
+             <p> 14 different tracks: frontend, security, AI, big data, PHP, Soft Skills, C++ and many more</p>
+             <p> Wordl Class C++ speaakers, 4 members of ISO C++ Standard Commitee:  Nocolai Jossutis(!), Guy Davidson, Timur Daumler &amp; Mateusz Pusz</p>
+             <p> 8x45min talks </p>
+            </section>
+            <section>
+            <h3> Agenda </h3>
+                <ol>
+                    <li>C++: a fast tour of a fast language</li>
+                    <li>Deep Learning Atlas</li>
+                    <li>Move Semantics for Trvial Classes</li>
+                    <li>Initialisation in modern C++</li>
+                    <li>Using Exceptions in C++: a practical guide </li>
+                    <li>Implementing Physical Units Library for C++</li>
+                    <li>Photography with Microsoft Cognitive Services</li>
+                    <li>Standardising Linear Algebra for C++23</li>
+                </ol>
+            </section>
+            <section>
+                <h3>C++: a fast tour of a fast language</h3>
+                <p><small>by Adrian Ostrowski </small></p>
+                <p> Talk about evolution and future of C++ language </p>
+            </section>
+            <section>
+                <ul>
+                <li > Author described briefly most important C++ features - from C++11 to C++23</li>
+                <li class="fragment "> Modern C++ is not about to use newest standard, but to use modern patterns: using std not own types, RAII, using algorithms </li>
+                <li class="fragment "> C++20 will be big as C++11 - coroutines, modules, ranges, concepts</li>
+                <li class="fragment "> C++23: contracts, {fmt}, reflections, metaclasses, static exceptions </li>
+                </ul>
+            </section>
+            <section>
+                <h3> Deep Learning Atlas </h3>
+                <p><small>by Michał Karzyński</small></p>
+                <p> Deep learning for dummies</p>
+            </section>
+            <section>
+                <ul>
+                    <li> Overview about neural networks and deep learning </li>
+                    <li class="fragment "> What are neural networks? </li>
+                    <li class="fragment "> What makes them recurrent or convolutional? </li>
+                </ul>
+                <img class="fragment" src="img/deep2.png"/>
+            </section>
+            <section>
+                <img src="img/deep.png"/>
+            </section>
+            <section>
+                <h3>Move Semantics for Trvial Classes</h3>
+                <p><small>by Nico Josuttis</small></p>
+                <p>How simple class with copy-expensible objects should be implemented</p>
+            </section>
+            <section>
+                <p>Nico proposes different implementations for different developers:</p>
+            </section>
+            <section>
+                <ul> Constructor
+                  <li> Beginners:</li>
+                 </ul>
+                <pre class="code fragment"><code>struct Foo {
+  std::string first;
+  std::string last;
+  Foo(const std::string&amp; s1, const std::string&amp; s2 = ""): 
+    first(s1), last(s2) {}
+};</code></pre>
+                 <ul>
+                  <li class="fragment"> Advanced:</li>
+                 </ul>
+                <pre class="code fragment"><code>struct Foo {
+  std::string first;
+  std::string last;
+  Foo(std::string s1, std::string s2 = ""): 
+    first(std::move(s1)), last(std::move(s2)) {}
+};</code></pre>
+            </section>
+        <section>
+          <img src="img/nico1.png"/>
+        </section>
+        <section>
+                 <ul>
+                  <li> Library writers:</li>
+                 </ul>
+<pre class="code fragment"><code>struct Foo {
+    std::string name;
+    template&lt;typename S1, typename S2 = std::string, 
+       typename = std::enable_if_t&lt;!std::is_same_v&lt;S1, Foo2&gt;&gt;&gt;
+    Foo(S1&amp;&amp; s1, S2&amp;&amp; s2= ""): 
+      first(std::forward&lt;S1&gt;(s1)), 
+      last(std::forward&lt;S2&gt;(s2)) {}
+};</code></pre>
+        </section>
+        <section>
+                <ul> Setters
+                  <li> Beginners:</li>
+                 </ul>
+                <pre class="code fragment"><code>struct Foo {
+  std::string s1;
+  void SetName(const std::string&amp; s) {
+    s1 = s;
+  }
+};</code></pre>
+                 <ul>
+                  <li class="fragment"> Advanced:</li>
+                 </ul>
+                <pre class="code fragment"><code>struct Foo {
+  std::string s1;
+  void SetName(const std::string&amp; s) {
+    s1 = s;
+  }
+};</code></pre>
+        </section>
+        <section>
+                <ul> Getters
+                  <li> Normal people:</li>
+                 </ul>
+                <pre class="code fragment"><code>struct Foo {
+  std::string s1;
+  std::string GetName() {
+   return s1;
+  }
+};</code></pre>
+                 <ul>
+                  <li class="fragment"> Strange people:</li>
+                 </ul>
+                <pre class="code fragment"><code>struct Foo {
+  std::string s1;
+  const std::string&amp; GetName() const &amp;{
+    return s1;
+  }
+  std::string GetName() &amp;&amp;{
+    return std::move(s1);
+  }
+};</code></pre>
+        </section>
+        <section>
+            <h3>Initialisation in modern C++</h3>
+            <p><small>by Timur Doumler</small></p>
+        </section>
+        <section>
+            <img src="img/init.gif" height="400px"/>
+        </section>
+        <section>
+            <img src="img/timur1.png"/>
+        </section>
+        <section>
+            <img src="img/timur2.png"/>
+        </section>
+        <section>
+            <h3>Using Exceptions in C++: a practical guide </h3>
+            <p><small>by Zbigniew Skowron</small></p>
+        </section>
+        <section>
+           <ul>
+             <li> We should use exceptions for handling errors</li>
+             <li> Exceptions are heavy only when they are handled</li>
+             <li> We shouldn't use exceptions to programm logic(!)</li>
+             <li> Don't create own exceptions - std::runtime_error is suitable for most cases </li>
+             <li> Lightweight exceptions wasn't discussed at all :( </li>
+           </ul>
+        </section>
+        <section>
+            <h3>Implementing Physical Units Library for C++</h3>
+            <p><small>by </small></p>
+        </section>
+        <section>
+          <p> Currently C++ doesn't have any support for units </p>
+          <p> Goal is to create &amp; standarize unit library</p>
+          <p> Existing solution are terrible in debugging </p>
+          <p> The biggest challenge is... temperature </p>
+        </section>
+        <section>
+            <h3>Photography with Microsoft Cognitive Services</h3>
+            <p><small>by </small></p>
+        </section>
+        <section>
+        <p> <blockquote> Some guy that connected camera to computer and query the network </blockquote></p>
+        </section>
+        <section>
+            <h3>Standardising Linear Algebra for C++23</h3>
+            <p><small>by Guy Davidson</small></p>
+        </section>
+        <section>
+<pre class="code fragment"><code>
+  std::complex&lt;int&gt; ci(3, 0);
+  std::complex&lt;double&gt; cd(3, 0);
+
+  auto cc = ci / cd ;
+</code></pre>
+        </section>
+        <section>
+          <h3> Bonus </h3> 
+          <img src="img/dupa.jpg" class="fragment"/>
+        </section>
+        <section>
+          <h1> Thank you! </h1>
+        </section>
+
+			</div>
+		</div>
+
+		<script src="../reveal.js/lib/js/head.min.js"></script>
+		<script src="../reveal.js/js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+				dependencies: [
+					{ src: '../reveal.js/plugin/markdown/marked.js' },
+					{ src: '../reveal.js/plugin/markdown/markdown.js' },
+					{ src: '../reveal.js/plugin/notes/notes.js', async: true },
+					{ src: '../reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+		</script>
+	</body>
+</html>
