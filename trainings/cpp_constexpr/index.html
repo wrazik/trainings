@@ -255,8 +255,8 @@ int main() {
       "movq $2,  %rdi\n\t"
       "syscall"); // Not compiling
 } </code></pre>
-            <p class="fragment"> goto statements or label different than case and default</p>
-                <pre class="code fragment"><code>constexpr int foo(int n) {
+            <p class="fragment hljs cpp"> goto statements or label different than case and default</p>
+                <pre class="code fragment cpp"><code>constexpr int foo(int n) {
   if (n == 2) 
     goto error; //goto sucks more than typedef
   bar(n);
@@ -265,9 +265,9 @@ error:
 }</code></pre>
         </section>
         <section>
-            <p class="fragment"> try-block </p>
+            <p class="hlcpp"> try-block </p>
                 <pre class="code fragment"><code>constexpr int foo(int n) {
-  try {
+  try { //error
     foo();
   }
   catch(const std::exception&amp; e) {
@@ -276,23 +276,36 @@ error:
 }</code></pre>
         </section>
         <section>
-            <p class="fragment"> try-block </p>
-                <pre class="code fragment"><code>constexpr int foo(int n) {
-  try {
-    foo();
-  }
-  catch(const std::exception&amp; e) {
-    std::cout &lt;&lt; "Error: " &lt;&lt; e.what() &lt;&lt; "\n";
-  }
+            <p class=""> non-literal type variable </p>
+            <p class=""> definition of a variable of static or thread storage duration </p>
+                <pre class="code fragment"><code> constexpr void foo() {
+  constexpr static int s = 0; //error
+  constexpr thread_local int t = 0; //error
+}</code></pre>
+<p code class="fragment"> Wait, but you did create static constexpr! </p>
+<p code class="fragment"> Yes, but not in the function body.</p>
+<pre class="code fragment"><code>constexpr static int s = 0; // OK
+constexpr void foo() {
+  thread_local int t = 0; // error
+  constexpr static int t = 0; // error
+}
+void foo(int) {
+  constexpr static int i = 0; // OK
+  constexpr thread_local int j = 0; // OK
 }</code></pre>
         </section>
         <section>
-           <p> definition of a variable of non-literal-type <p>
-           <p> definition of static or thread storage duration <p>
            <p> a definition of variable for which no initialization is performed <p>
+<pre class="code fragment"><code>
+constexpr void foo() {
+  int i = 42; // OK
+  int i; // Error, no initialization performed
+}</code></pre>
         </section>
         <section>
-          
+          <h2> constructors </h2>
+          <p> No virtual
+          <p> ...same constraints as functions </p>
         </section>
         <section>
           <h2>C++17<h2>
