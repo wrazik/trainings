@@ -235,6 +235,47 @@ int main() {
            <p> The class must not have virtual base classes </p>
            <p> Can be defaulted, deleted </p>
            <p> The same constraints as for constexpr function, except single return statement </p>
+           <p> All members must be initialized! </p> 
+        </section>
+        <section>
+                <pre class="code fragment cpp"><code>struct Foo {
+ int i;
+ int j;
+};
+
+struct Bar: Foo {};
+
+int main() { 
+  constexpr Bar b; //error 
+}</code></pre>
+        </section>
+        <section>
+                <pre class="code fragment cpp"><code>struct Foo {
+ int i = 0;
+ int j = 0;
+};
+
+struct Bar: Foo {};
+
+int main() { 
+  constexpr Bar b; // Ok, all members initialized 
+}</code></pre>
+        </section>
+        <section>
+                <pre class="code fragment cpp"><code>struct Foo {
+ int i;
+ int j;
+};
+
+struct Bar: Foo {
+  constexpr Bar(): Foo{42, 666} {
+  }
+};
+
+int main() { 
+  constexpr Bar b;
+} 
+</code></pre>
         </section>
         <section>
           <h1> C++14 </h1>
@@ -255,7 +296,7 @@ int main() {
       "movq $2,  %rdi\n\t"
       "syscall"); // Not compiling
 } </code></pre>
-            <p class="fragment hljs cpp"> goto statements or label different than case and default</p>
+            <p> goto statements or label different than case and default</p>
                 <pre class="code fragment cpp"><code>constexpr int foo(int n) {
   if (n == 2) 
     goto error; //goto sucks more than typedef
@@ -282,8 +323,8 @@ error:
   constexpr static int s = 0; //error
   constexpr thread_local int t = 0; //error
 }</code></pre>
-<p code class="fragment"> Wait, but you did create static constexpr! </p>
-<p code class="fragment"> Yes, but not in the function body.</p>
+<p class="fragment"> Wait, but you did create static constexpr! </p>
+<p class="fragment"> Yes, but not in the function body.</p>
 <pre class="code fragment"><code>constexpr static int s = 0; // OK
 constexpr void foo() {
   thread_local int t = 0; // error
@@ -303,12 +344,50 @@ constexpr void foo() {
 }</code></pre>
         </section>
         <section>
-          <h2> constructors </h2>
-          <p> No virtual
-          <p> ...same constraints as functions </p>
+          <h2> Constructors </h2>
+          <p> Same constraints are functions </p>
         </section>
         <section>
           <h2>C++17<h2>
+        </section>
+        <section>
+           <h3> Variables</h3>
+           <p> Same constraints as in C++14/11 </p>
+           <p> ... but one extra property: constexpr member variable implies inline <p>
+        </section>
+        <section>
+           <p> As you know, in C++17 we can have inline class members</p>
+           <ul>
+<li> There can be more than one definition of an inline variable</li>
+<li> The definition of an inline variable must be present in the translation unit, in which it is used </li>
+<li> A global inline variable (non-static inline variable) must be declared inline in every translation unit and has the same address in every translation unit.</li>
+           </ul>
+        </section>
+        <section>
+           <p> Bla, bla, bla....</p>
+           <p> You can put variables into you header files and include them more than once, without ugly implementation in cpp file</p>
+        </section>
+        <section>
+           <p> Before C++17</p>
+<pre class="code fragment"><code>
+class A {   
+private:      
+  static const string RECTANGLE;
+};
+// In one of the implementation files
+const string A::RECTANGLE = "rectangle";
+</code></pre>
+           <p class="fragment"> In C++17</p>
+<pre class="code fragment"><code>// In a header file 
+class A {   
+private:      
+  inline static const string RECTANGLE = "rectangle";
+};
+</code></pre>
+        </section>
+        <section>
+        </section>
+        <section>
               <p> constexpr lambda</p>
               <p> if constexpr -alexandrescu talk
 https://brevzin.github.io/c++/2019/01/15/if-constexpr-isnt-broken/
@@ -337,9 +416,6 @@ https://www.youtube.com/watch?v=tcyb1lpEHm0 </p>
           <h2>exceptions<h2>
         </section>
         <section>
-          <h2>Compilation<h2>
-        </section>
-        <section>
           <h2> Summary <h2>
 <ul>
           <li> With newer versions of the standard constexpr has more and more support </li>
@@ -358,6 +434,7 @@ https://www.youtube.com/watch?v=tcyb1lpEHm0 </p>
             <li> <a href="https://www.youtube.com/watch?v=JXJg_XMJFW0">C++ Weekly Ep 159 - 'constexpr' 'virtual' Members in C++20</a></li>
             <li> <a href="https://en.cppreference.com/w/cpp/language/constexpr"> cppreference.com </a></li>
             <li> <a href="https://stackoverflow.com/questions/28614591/how-to-initialize-a-constexpr-reference"> stackoverflow.com </a></li>
+            <li> <a href="https://www.modernescpp.com/index.php/c-17-more-details-to-the-core-language">Modernes cpp </a></li>
           </ul>
         </section>
         <section>
