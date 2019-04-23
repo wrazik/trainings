@@ -6,7 +6,9 @@
 	    <title>constexpr-land</title>
 
 		<link rel="stylesheet" href="../reveal.js/css/reveal.css">
-		<link rel="stylesheet" href="../reveal.js/css/theme/league.css">
+		<link rel="stylesheet" href="../reveal.js/css/theme/beige.css">
+		<!-- league -->
+
 
 		<!-- Theme used for syntax highlighting of code -->
 		<link rel="stylesheet" href="../reveal.js/lib/css/zenburn.css">
@@ -36,7 +38,7 @@
           <h3> C++ is awesome! </h3>
           <p> You can learn it for many years and it will still suprise you!</p> 
           <p> But that's make it even more fun!</p> 
-          <img class="fragment" src="img/effective.png" height=400px/>
+          <img class="fragment" src="img/effective.png" height=300px/>
         </section>
         <section>
           <h2> constexpr </h2>
@@ -66,7 +68,6 @@ template&lt;&gt; struct Fib&lt;1&gt; { enum { val = 1 }; };
 //...
  std::cout &lt;&lt; Fib&lt;4&gt;::val &lt;&lt; std::endl;
 </code></pre>
-<p> vs </p>
 <pre class="code"><code>constexpr int fibonacci(int i) {
   switch (i) {
     case 0: return 0;
@@ -105,19 +106,16 @@ template&lt;&gt; struct Fib&lt;1&gt; { enum { val = 1 }; };
                 <pre class="code"><code>struct Foo {
   int i;
   ~Foo() = default;
-};
-                </code></pre>
+};</code></pre>
                 <pre class="code fragment"><code>struct Foo {
   int i;
   ~Foo() {}
-};
-                </code></pre>
+};</code></pre>
                 <pre class="code fragment"><code>struct Foo {
   int i;
   ~Foo();
 };
-Foo::~Foo() = default;
-                </code></pre>
+Foo::~Foo() = default;</code></pre>
         </section>
         <section>
                 <pre class="code"><code>struct Foo {
@@ -192,42 +190,26 @@ int main(int argc, char** argv) {
         <section>
           <p> constexpr function can take only LiteralType arguments, and can return only LiteralType value </p>
           <p> In C++11, we have <i>whitelist</i> of statements that are allowed in constant time context</p>
-              <ul> Allowed:
+              <ul>
                 <li> function can be deleted </li>
                 <li> special members can be defaulted </li>
                 <li> may contain null statements </li>
               </ul>
-                <pre class="code"><code>
-constexpr void foo() = delete;
-constexpr Foo::Foo() = default;
-constexpr void foo() {
-    ;
-    ;;                        
-}
-                  </code></pre>
               </section>
           <section>
 <p> static_assert </p>
-
-                <pre class="code"><code>
-constexpr void foo() {
+                <pre class="code"><code>constexpr void foo() {
   static_assert(sizeof(short int) == sizeof(int));
   static_assert(sizeof(int) == sizeof(long int));
-}
-                </code></pre>
+}</code></pre>
 <p> typedefs and alias declarations that do not define classes or enumarations </p>
-
-                <pre class="code"><code>
-constexpr void foo() {
+                <pre class="code"><code>constexpr void foo() {
   typedef std::string string; // OK, but typedef sucks!
   using MyType = some::fancy_namespace::Type&lt;int&gt;; // Ok
-}
-                </code></pre>
-                <pre class="code"><code>
-constexpr void foo() {
+}</code></pre>
+                <pre class="code"><code>constexpr void foo() {
   typedef struct Foo {} f; // Error, typedef still sucks
-}
-                </code></pre>
+}</code></pre>
         </section>
         <section>
 <p> using declarations and using directives </p>
@@ -340,7 +322,7 @@ error:
         </section>
         <section>
             <p class="hlcpp"> try-block </p>
-                <pre class="code fragment"><code>constexpr int foo(int n) {
+                <pre class="code"><code>constexpr int foo(int n) {
   try { //error
     foo();
   }
@@ -349,31 +331,27 @@ error:
   }
 }</code></pre>
           <p>... but throw is allowed! </p>
-        <pre class="code fragment"><code>constexpr int f(bool b) { 
-return b ? throw 0 : 0;  // OK
+        <pre class="code"><code>constexpr int f(bool b) { 
+  return b ? throw 0 : 0;  // OK
 } 
 constexpr int f() { 
-   return f(true); 
-} 
+   return f(false); 
 }</code></pre>
+<p> Will it work in C++11? </p>
         </section>
         <section>
             <p class=""> non-literal type variable </p>
             <p class=""> definition of a variable of static or thread storage duration </p>
-                <pre class="code fragment"><code> constexpr void foo() {
   constexpr static int s = 0; //error
   constexpr thread_local int t = 0; //error
 }</code></pre>
-<p class="fragment"> Wait, but you did create static constexpr! </p>
-<p class="fragment"> Yes, but not in constexpr function body.</p>
-<pre class="code fragment"><code>constexpr static int s = 0; // OK
+<p class=""> (constexpr statics and thread_locals are ok)</p>
+<pre class="code"><code>constexpr static int s = 0; // OK
 constexpr void foo() {
-  thread_local int t = 0; // error
   constexpr static int t = 0; // error
 }
 void foo(int) {
   constexpr static int i = 0; // OK
-  constexpr thread_local int j = 0; // OK
 }</code></pre>
         </section>
         <section>
@@ -424,28 +402,16 @@ constexpr int i = NonNegative{2}.get(); // Now it's working!
         </section>
         <section>
            <p> As you know, in C++17 we can have inline class members</p>
-           <ul>
-<li> There can be more than one definition of an inline variable</li>
-<li> The definition of an inline variable must be present in the translation unit, in which it is used </li>
-<li> A global inline variable (non-static inline variable) must be declared inline in every translation unit and has the same address in every translation unit.</li>
-           </ul>
-        </section>
-        <section>
-           <p> Bla, bla, bla....</p>
-           <p> You can put variables into you header files and include them more than once, without ugly implementation in cpp file</p>
-        </section>
-        <section>
            <p> Before C++17</p>
-<pre class="code fragment"><code>
-class A {   
+<pre class="code"><code>class A {   
 private:      
   static const string RECTANGLE;
 };
 // In one of the implementation files
 const string A::RECTANGLE = "rectangle";
 </code></pre>
-           <p class="fragment"> In C++17</p>
-<pre class="code fragment"><code>// In a header file 
+           <p class=""> In C++17</p>
+<pre class="code"><code>// In a header file 
 class A {   
 private:      
   inline static const string RECTANGLE = "rectangle";
@@ -463,8 +429,19 @@ private:
         <section>
            <h3> constexpr lambdas </h3>
            <p> since C++17 we have constexpr lambdas </p>
+<pre class="code"><code>int main() {
+  constexpr int i = 6;
+  constexpr int j = 7;
+  constexpr int answer = [](auto i, auto j) {
+    return i*j;
+  }(i, j);
+}
+</code></pre>
+   <p> Bonus: did you knew about <a href="https://cppinsights.io/lnk?code=aW50IG1haW4oKSB7CiAgY29uc3RleHByIGludCBpID0gNjsKICBjb25zdGV4cHIgaW50IGogPSA3OwogIGNvbnN0ZXhwciBpbnQgYW5zd2VyID0gW10oYXV0byBpLCBhdXRvIGopIHsKICAgIHJldHVybiBpKmo7CiAgfShpLCBqKTsKfQo=&insightsOptions=cpp17&std=cpp17&rev=1.0">cppinsights.io? </a></p>
         </section>
-        
+        <section>
+          <h3> constexpr virtual </h3>
+        </section>
         <section>
           <p> The most important C++17 constexpr feature - if constexpr </p>
           <p> Simplest example - comparing the numbers </p>
@@ -486,13 +463,12 @@ private:
           <p> Approved, but not present yet C++20 </p>
           <p> std::construct_at, std::ranges::construct_at, std::destroy_at</p>
           <p> Contains virtual constexpr destructor etc... </p>
-<pre class="code"><code>
-template&lt;class T, class... Args&gt;
+<pre class="code"><code>template&lt;class T, class... Args&gt;
     constexpr T* construct_at(T* location, Args&amp;&amp;... args);
 
-    namespace ranges {
+namespace ranges {
     template&lt;class T, class... Args&gt;
-    requires Constructible&lt;T, Args...&gt;
+        requires Constructible&lt;T, Args...&gt;
     constexpr T* construct_at(T*, Args&amp;&amp;...); 
 </code></pre>
         </section> 
@@ -508,6 +484,13 @@ template&lt;class T, class... Args&gt;
         </section>
         <section>
           <h1> Questions? </h1>
+        </section>
+        <section>
+          <h1> Thank you! </h1>
+        </section>
+        <section>
+          <p> Did you know cpp-polska.pl? </p>
+          <p> If you love C++ - join our slack! - c++ quizes, blogposts, questions, interesting libraries and more! <a href="http://bit.ly/cpppolska-slack">bit.ly/cpppolska-slack</a></p>
         </section>
         <section>
           <p>Sources: </p>
