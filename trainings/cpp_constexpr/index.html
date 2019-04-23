@@ -1,7 +1,6 @@
 <!doctype html>
 <html>
-	<head>
-		<meta charset="utf-8">
+	<head> <meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 	    <title>constexpr-land</title>
@@ -106,9 +105,9 @@ struct FooBar {
 };
 FooBar::~FooBar() = default;
 int main() {
-  constexpr Foo f{};    // OK
-  constexpr Bar b{};    // Error, non-trivial destructor
-  constexpr FooBar b{}; // Error, non-trivial destructor
+  constexpr Foo f{};     // OK
+  constexpr Bar b{};     // Error, non-trivial destructor
+  constexpr FooBar fb{}; // Error, non-trivial destructor
 }
                 </code></pre>
         </section>
@@ -227,7 +226,17 @@ int main() {
         <section>
           <p> Note: </p>
           <p> constexpr specifier used in a function implies inline</p>
-          <img src="img/godbolt.png"/>
+          <p> constexpr specifier in non-static member functions implies const (which is... bad)</p>
+<pre class="code"><code>struct NonNegative
+{
+  int i;
+  constexpr int const&amp; get() /*const*/ { return i; }
+  int&amp; get() { return i; }
+};
+//... later
+constexpr int i = NonNegative{2}.get(); 
+// Error, not trying to call int&amp; get()
+</code></pre>
         </section>
         <section>
            <h3> Constructors</h3>
@@ -344,6 +353,32 @@ constexpr void foo() {
 }</code></pre>
         </section>
         <section>
+           <p> Since C++14, constexpr specifier for non-static member function does NOT imply const </p> 
+<pre class="code"><code>struct NonNegative //C++11
+{
+  int i;
+  constexpr int const&amp; get() /* const */{ return i; }
+  int&amp; get() { return i; }
+};
+//... later
+constexpr int i = NonNegative{2}.get(); //Error 
+</code></pre>
+       
+        </section>
+        <section>
+           <p> Since C++14, constexpr specifier for non-static member function does NOT imply const </p> 
+<pre class="code"><code>struct NonNegative //C++14
+{
+  int i;
+  constexpr int const&amp; get() const { return i; }
+  constexpr int&amp; get() { return i; }
+};
+//... later
+constexpr int i = NonNegative{2}.get(); // Now it's working!
+</code></pre>
+       
+        </section>
+        <section>
           <h2> Constructors </h2>
           <p> Same constraints are functions </p>
         </section>
@@ -386,6 +421,8 @@ private:
 </code></pre>
         </section>
         <section>
+          <p> The most important C++17 feature - if constexpr </p>
+          <p> Simplest example - comparing the numbers </p>
         </section>
         <section>
               <p> constexpr lambda</p>
@@ -393,21 +430,6 @@ private:
 https://brevzin.github.io/c++/2019/01/15/if-constexpr-isnt-broken/
 https://www.youtube.com/watch?v=tcyb1lpEHm0 </p>
               <p> constexpr inline variables</p> 
-        </section>
-        <section>
-          <h2>C++20<h2>
-              <p> constexpr virtual</p>
-<p> constexpr containers: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p0784r5.html</p>
-        </section>
-        <section>
-          <h2>constexpr types<h2>
-        </section>
-        <section>
-          <h2>constexpr new/delete<h2>
-<p> try/catch</p>
-<p> function try/catch </p>
-<p> is_constant_evaluated </p>
-<p> </p>
         </section>
         <section>
    
@@ -435,6 +457,8 @@ https://www.youtube.com/watch?v=tcyb1lpEHm0 </p>
             <li> <a href="https://en.cppreference.com/w/cpp/language/constexpr"> cppreference.com </a></li>
             <li> <a href="https://stackoverflow.com/questions/28614591/how-to-initialize-a-constexpr-reference"> stackoverflow.com </a></li>
             <li> <a href="https://www.modernescpp.com/index.php/c-17-more-details-to-the-core-language">Modernes cpp </a></li>
+<li><a href="https://www.bfilipek.com/2018/03/ifconstexpr.html">Bfilipek.com</a></li>
+            <li> <a href="https://akrzemi1.wordpress.com/2013/06/20/constexpr-function-is-not-const/">Andrzej Krzeminski blog</a></li>
           </ul>
         </section>
         <section>
