@@ -38,7 +38,7 @@
           <h3> C++ is awesome! </h3>
           <p> You can learn it for many years and it will still suprise you!</p> 
           <p> But that's make it even more fun!</p> 
-          <img class="fragment" src="img/effective.png" height=300px/>
+          <img class="fragment" src="img/effective.png" height=300/>
         </section>
         <section>
           <h2> constexpr </h2>
@@ -197,12 +197,16 @@ int main(int argc, char** argv) {
               </ul>
               </section>
           <section>
-<p> static_assert </p>
+<ul>
+<li> static_assert </li>
+</ul>
                 <pre class="code"><code>constexpr void foo() {
   static_assert(sizeof(short int) == sizeof(int));
   static_assert(sizeof(int) == sizeof(long int));
 }</code></pre>
-<p> typedefs and alias declarations that do not define classes or enumarations </p>
+<ul>
+<li> typedefs and alias declarations that do not define classes or enumarations </li>
+</ul>
                 <pre class="code"><code>constexpr void foo() {
   typedef std::string string; // OK, but typedef sucks!
   using MyType = some::fancy_namespace::Type&lt;int&gt;; // Ok
@@ -321,6 +325,28 @@ error:
 }</code></pre>
         </section>
         <section>
+            <p class=""> non-literal type variable </p>
+            <p class=""> definition of a variable of static or thread storage duration </p>
+<pre class="code"><code>constexpr static int s = 0; //error
+constexpr thread_local int t = 0; //error</code></pre>
+<p class=""> (constexpr statics and thread_locals are ok)</p>
+<pre class="code"><code>constexpr static int s = 0; // OK
+constexpr void foo() {
+  constexpr static int t = 0; // error
+}
+void foo(int) {
+  constexpr static int i = 0; // OK
+}</code></pre>
+        </section>
+        <section>
+           <p> a definition of variable for which no initialization is performed <p>
+<pre class="code"><code>
+constexpr void foo() {
+  int i = 42; // OK
+  int i; // Error, no initialization performed
+}</code></pre>
+        </section>
+        <section>
             <p class="hlcpp"> try-block </p>
                 <pre class="code"><code>constexpr int foo(int n) {
   try { //error
@@ -338,29 +364,6 @@ constexpr int f() {
    return f(false); 
 }</code></pre>
 <p> Will it work in C++11? </p>
-        </section>
-        <section>
-            <p class=""> non-literal type variable </p>
-            <p class=""> definition of a variable of static or thread storage duration </p>
-  constexpr static int s = 0; //error
-  constexpr thread_local int t = 0; //error
-}</code></pre>
-<p class=""> (constexpr statics and thread_locals are ok)</p>
-<pre class="code"><code>constexpr static int s = 0; // OK
-constexpr void foo() {
-  constexpr static int t = 0; // error
-}
-void foo(int) {
-  constexpr static int i = 0; // OK
-}</code></pre>
-        </section>
-        <section>
-           <p> a definition of variable for which no initialization is performed <p>
-<pre class="code fragment"><code>
-constexpr void foo() {
-  int i = 42; // OK
-  int i; // Error, no initialization performed
-}</code></pre>
         </section>
         <section>
            <p> Since C++14, constexpr specifier for non-static member function does NOT imply const </p> 
@@ -437,19 +440,85 @@ private:
   }(i, j);
 }
 </code></pre>
-   <p> Bonus: did you knew about <a href="https://cppinsights.io/lnk?code=aW50IG1haW4oKSB7CiAgY29uc3RleHByIGludCBpID0gNjsKICBjb25zdGV4cHIgaW50IGogPSA3OwogIGNvbnN0ZXhwciBpbnQgYW5zd2VyID0gW10oYXV0byBpLCBhdXRvIGopIHsKICAgIHJldHVybiBpKmo7CiAgfShpLCBqKTsKfQo=&insightsOptions=cpp17&std=cpp17&rev=1.0">cppinsights.io? </a></p>
-        </section>
-        <section>
-          <h3> constexpr virtual </h3>
+   <p> Bonus: did you knew about <a href="https://cppinsights.io/lnk?code=aW50IG1haW4oKSB7CiAgY29uc3RleHByIGludCBpID0gNjsKICBjb25zdGV4cHIgaW50IGogPSA3OwogIGNvbnN0ZXhwciBpbnQgYW5zd2VyID0gW10oYXV0byBpLCBhdXRvIGopIHsKICAgIHJldHVybiBpKmo7CiAgfShpLCBqKTsKfQo=&insightsOptions=cpp17&std=cpp17&rev=1.0" target="_blank">cppinsights.io? </a></p>
         </section>
         <section>
           <p> The most important C++17 constexpr feature - if constexpr </p>
-          <p> Simplest example - comparing the numbers </p>
+          <p> outside a template, if constexpr is fully checked </p>
+<pre class="code"><code>int foo(int arg) {
+  if constexpr(true) {
+    return 6*7;
+  } 
+  else {
+    non_existing_function(); // Error
+  }
+}</code></pre>
+        </section>
+        <section> 
+<p> branch is not checked, when it depends on template parameter</p>
+<pre class="code"><code>template &lt;typename T&gt;
+int foo(T arg) {
+  if constexpr (std::is_arithmetic_v&lt;T&gt;)
+     return arg;
+  else
+     non_existing_function();  //Error, don't depend on T
+}
+</code></pre>
+        </section>
+        <section> 
+<p> branch is not checked, when it depends on template parameter</p>
+<pre class="code"><code>template &lt;typename T&gt;
+int foo(T arg) {
+  if constexpr (std::is_arithmetic_v&lt;T&gt;)
+     return arg;
+  else
+     non_existing_function(arg);  //Ok, depend on T
+}
+</code></pre>
+        </section>
+        <section>
+          <p> Thanks to if constexpr, we can remove some of the enable_if! </p>
+          <p> Example: comparing two numbers </p>
+<pre class="code"><code>template &lt;class T&gt;
+constexpr T absolute(T arg) {
+  return arg &lt; 0 ? -arg : arg;
+}
+
+template &lt;class T&gt;
+constexpr enable_if_t&lt;is_floating_point&lt;T&gt;::value, bool&gt; 
+close_enough(T a, T b) {
+  return absolute(a - b) &lt; static_cast&lt;T&gt;(0.000001);
+}
+template &lt;class T&gt;
+constexpr enable_if_t&lt;!is_floating_point&lt;T&gt;::value, bool&gt; 
+close_enough(T a, T b) {
+   return a == b;
+}</code></pre>
+        </section>
+<section>
+<p></p>
+<pre class="code"><code>template &lt;class T&gt;
+constexpr T absolute(T arg) {
+  return arg &lt; 0 ? -arg : arg;
+}
+
+template &lt;class T&gt;
+constexpr auto precision_threshold = T(0.000001);
+
+template &lt;class T&gt;
+constexpr bool close_enough(T a, T b) {
+  if constexpr (is_floating_point_v&lt;T&gt;) // &lt;&lt; !!
+    return absolute(a - b) &lt; precision_threshold&lt;T&gt;;
+  else
+    return a == b;
+}</code></pre>
         </section>
         <section>
           <p> Constexpr fixes to the standard library </p>
           <p> constexpr keyword was added in many places, most notable are: </p>
           <ul>
+             <li> std::array </li>
+             <li> begin() &amp; end() </li>
           </ul>
         </section>
         <section>
@@ -458,6 +527,30 @@ private:
         <section>
           <p> In C++20 we will have even more constexpr addition </p>
         </section> 
+        <section>
+          <p> try-catch allowed in function </p>
+          <p> constexpr virtual </p>
+<pre class="code"><code>struct Base {
+  constexpr virtual int get() = 0; 
+};
+
+struct Derrived1: Base {
+  constexpr int get() override {
+    return 1;
+  }; 
+};
+
+struct Derrived2: Base {
+  constexpr int get() override {
+    return 2;
+  }; 
+};
+
+int main() {
+  static_assert(1 == Derrived1().get());
+  static_assert(2 == Derrived2().get());
+}</code></pre>
+        </section>
         <section>
           <p> PR0784r5 - More constexpr containers </p>
           <p> Approved, but not present yet C++20 </p>
@@ -473,14 +566,12 @@ namespace ranges {
 </code></pre>
         </section> 
         <section>
-          <h2> Summary <h2>
-<p>
+          <h2> Summary </h2>
 <ul>
           <li> With newer versions of the standard constexpr has more and more support </li>
           <li> We should almost always preffer compile-time computations - they are done only once! </li>
           <li> Even if function is not used in compile time at the moment but it's possible to make it constexpr - make it constexpr</li>
-          <li> </li>
-</ul></p>
+</ul>
         </section>
         <section>
           <h1> Questions? </h1>
