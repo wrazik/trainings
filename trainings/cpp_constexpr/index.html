@@ -35,6 +35,7 @@
         <section>
           <h3> C++ is awesome! </h3>
           <p> You can learn it for many years and it will still suprise you!</p> 
+          <p> But that's make it even more fun!</p> 
           <img class="fragment" src="img/effective.png" height=400px/>
         </section>
         <section>
@@ -46,12 +47,37 @@
           <h2> constexpr </h2>
               <p> constexpr keyword was added to C++11 </p>
               <p> standard distinguish constexpr in three different places:</p>
-              <ul class="fragment"> 
+              <ul class=""> 
                 <li> variable </li>
                 <li> function </li>
                 <li> constructor </li>
               </ul>
-              <p class="fragment"> there is also if constexpr, and metaclass proposal from Herb Sutter with constexpr block </p>
+              <p class=""> there is also if constexpr, and metaclass proposal from Herb Sutter with constexpr block </p>
+        </section>
+        <section>
+         <p> Why constexpr is awesome? </p>
+<pre class="code"><code>template &lt;int n&gt; struct Fib
+{
+    enum { val = Fib&lt;n-1&gt;::val + Fib&lt;n-2&gt;::val };
+};
+
+template&lt;&gt; struct Fib&lt;0&gt; { enum { val = 0 }; };
+template&lt;&gt; struct Fib&lt;1&gt; { enum { val = 1 }; };
+//...
+ std::cout &lt;&lt; Fib&lt;4&gt;::val &lt;&lt; std::endl;
+</code></pre>
+<p> vs </p>
+<pre class="code"><code>constexpr int fibonacci(int i) {
+  switch (i) {
+    case 0: return 0;
+    case 1: return 1;
+    default: {
+      auto f1 = fibonacci(i-1);
+      auto f2 = fibonacci(i-2);
+      return f1+f2;
+    }
+  }
+}</code></pre>
         </section>
         <section>
             <h1> C++11 </h1>
@@ -112,7 +138,7 @@ int main() {
                 </code></pre>
         </section>
         <section>
-          <p> ...wait, constexpr reference?</p>
+          <p> constexpr reference?</p>
                 <pre class="code"><code>int main() {
   constexpr int i = 42;
   constexpr const int&amp; j = i; 
@@ -227,15 +253,14 @@ int main() {
           <p> Note: </p>
           <p> constexpr specifier used in a function implies inline</p>
           <p> constexpr specifier in non-static member functions implies const (which is... bad)</p>
-<pre class="code"><code>struct NonNegative
-{
+<pre class="code"><code>struct NonNegative {
   int i;
   constexpr int const&amp; get() /*const*/ { return i; }
   int&amp; get() { return i; }
 };
 //... later
 constexpr int i = NonNegative{2}.get(); 
-// Error, not trying to call int&amp; get()
+// Error, trying to call `int&amp; get()`
 </code></pre>
         </section>
         <section>
@@ -244,10 +269,10 @@ constexpr int i = NonNegative{2}.get();
            <p> The class must not have virtual base classes </p>
            <p> Can be defaulted, deleted </p>
            <p> The same constraints as for constexpr function, except single return statement </p>
-           <p> All members must be initialized! </p> 
+           <p> All members must be initialized </p> 
         </section>
         <section>
-                <pre class="code fragment cpp"><code>struct Foo {
+                <pre class="code cpp"><code>struct Foo {
  int i;
  int j;
 };
@@ -259,9 +284,9 @@ int main() {
 }</code></pre>
         </section>
         <section>
-                <pre class="code fragment cpp"><code>struct Foo {
- int i = 0;
- int j = 0;
+                <pre class="code cpp"><code>struct Foo {
+ int i = 0; // &lt;---
+ int j = 0; // &lt;---
 };
 
 struct Bar: Foo {};
@@ -271,20 +296,19 @@ int main() {
 }</code></pre>
         </section>
         <section>
-                <pre class="code fragment cpp"><code>struct Foo {
+                <pre class="code cpp"><code>struct Foo {
  int i;
  int j;
 };
 
 struct Bar: Foo {
-  constexpr Bar(): Foo{42, 666} {
+  constexpr Bar(): Foo{42, 666} { // &lt;--- 
   }
 };
 
 int main() { 
-  constexpr Bar b;
-} 
-</code></pre>
+  constexpr Bar b; //Ok, all members initialized
+}</code></pre>
         </section>
         <section>
           <h1> C++14 </h1>
@@ -299,14 +323,14 @@ int main() {
         </section>
         <section>
             <p> constexpr function in C++14 must <b>not</b> contain: </p>
-            <p class="fragment"> assembly block</p>
-                <pre class="code fragment"><code>constexpr int foo(int n) {
+            <p class=""> assembly block</p>
+                <pre class="code "><code>constexpr int foo(int n) {
   asm("movq $60, %rax\n\t" 
       "movq $2,  %rdi\n\t"
       "syscall"); // Not compiling
 } </code></pre>
             <p> goto statements or label different than case and default</p>
-                <pre class="code fragment cpp"><code>constexpr int foo(int n) {
+                <pre class="code cpp"><code>constexpr int foo(int n) {
   if (n == 2) 
     goto error; //goto sucks more than typedef
   bar(n);
@@ -324,6 +348,14 @@ error:
     std::cout &lt;&lt; "Error: " &lt;&lt; e.what() &lt;&lt; "\n";
   }
 }</code></pre>
+          <p>... but throw is allowed! </p>
+        <pre class="code fragment"><code>constexpr int f(bool b) { 
+return b ? throw 0 : 0;  // OK
+} 
+constexpr int f() { 
+   return f(true); 
+} 
+}</code></pre>
         </section>
         <section>
             <p class=""> non-literal type variable </p>
@@ -333,7 +365,7 @@ error:
   constexpr thread_local int t = 0; //error
 }</code></pre>
 <p class="fragment"> Wait, but you did create static constexpr! </p>
-<p class="fragment"> Yes, but not in the function body.</p>
+<p class="fragment"> Yes, but not in constexpr function body.</p>
 <pre class="code fragment"><code>constexpr static int s = 0; // OK
 constexpr void foo() {
   thread_local int t = 0; // error
@@ -421,30 +453,58 @@ private:
 </code></pre>
         </section>
         <section>
-          <p> The most important C++17 feature - if constexpr </p>
+           <h3> Functions </h3>
+           <p> ... same as in C++14<p>
+        </section>
+        <section>
+           <h3> Constructors </h3>
+           <p> ... same as in C++14<p>
+        </section>
+        <section>
+           <h3> constexpr lambdas </h3>
+           <p> since C++17 we have constexpr lambdas </p>
+        </section>
+        
+        <section>
+          <p> The most important C++17 constexpr feature - if constexpr </p>
           <p> Simplest example - comparing the numbers </p>
         </section>
         <section>
-              <p> constexpr lambda</p>
-              <p> if constexpr -alexandrescu talk
-https://brevzin.github.io/c++/2019/01/15/if-constexpr-isnt-broken/
-https://www.youtube.com/watch?v=tcyb1lpEHm0 </p>
-              <p> constexpr inline variables</p> 
+          <p> Constexpr fixes to the standard library </p>
+          <p> constexpr keyword was added in many places, most notable are: </p>
+          <ul>
+          </ul>
         </section>
         <section>
-   
+          <h2> C++20 </h2>
         </section> 
         <section>
-          <h2>exceptions<h2>
-        </section>
+          <p> In C++20 we will have even more constexpr addition </p>
+        </section> 
+        <section>
+          <p> PR0784r5 - More constexpr containers </p>
+          <p> Approved, but not present yet C++20 </p>
+          <p> std::construct_at, std::ranges::construct_at, std::destroy_at</p>
+          <p> Contains virtual constexpr destructor etc... </p>
+<pre class="code"><code>
+template&lt;class T, class... Args&gt;
+    constexpr T* construct_at(T* location, Args&amp;&amp;... args);
+
+    namespace ranges {
+    template&lt;class T, class... Args&gt;
+    requires Constructible&lt;T, Args...&gt;
+    constexpr T* construct_at(T*, Args&amp;&amp;...); 
+</code></pre>
+        </section> 
         <section>
           <h2> Summary <h2>
+<p>
 <ul>
           <li> With newer versions of the standard constexpr has more and more support </li>
           <li> We should almost always preffer compile-time computations - they are done only once! </li>
-          <li> If a function may have to be evaluated at compile time, declare it constexpr </li>
+          <li> Even if function is not used in compile time at the moment but it's possible to make it constexpr - make it constexpr</li>
           <li> </li>
-</ul>
+</ul></p>
         </section>
         <section>
           <h1> Questions? </h1>
@@ -459,6 +519,7 @@ https://www.youtube.com/watch?v=tcyb1lpEHm0 </p>
             <li> <a href="https://www.modernescpp.com/index.php/c-17-more-details-to-the-core-language">Modernes cpp </a></li>
 <li><a href="https://www.bfilipek.com/2018/03/ifconstexpr.html">Bfilipek.com</a></li>
             <li> <a href="https://akrzemi1.wordpress.com/2013/06/20/constexpr-function-is-not-const/">Andrzej Krzeminski blog</a></li>
+<li> <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p0784r5.html">P0784r5 - More constexpr containers</a></li>
           </ul>
         </section>
         <section>
