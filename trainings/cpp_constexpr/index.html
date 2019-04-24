@@ -175,17 +175,15 @@ int main(int argc, char** argv) {
         <section>
 <p> even if it's not used in constexpr context <b>anywhere</b>, it can't contain expression that can't be evaluated at compile time* </p>
                 <pre class="code"><code>
-constexpr int foo(const int i) {
-  const int x {42}; // Error in C++11, even though
-                    // not called in constexpr context
-  return x*i;
+constexpr void foo(const int i) {
+  int x; // Error even though
+         // not called in constexpr context
 }
 
 int main(int argc, char** argv) {
   foo(argc);
 }
                 </code></pre>
-
         </section>
         <section>
           <p> constexpr function can take only LiteralType arguments, and can return only LiteralType value </p>
@@ -219,7 +217,7 @@ int main(int argc, char** argv) {
 <p> using declarations and using directives </p>
                 <pre class="code"><code>
 constexpr void foo() {
-  using namespace std; // using-directive, Ok, but don't do that
+  using namespace std; // using-directive, Ok, but be carefull 
   using some::fancy_namespace::Foo; // using-declaration, OK
 }
                 </code></pre>
@@ -251,7 +249,7 @@ constexpr int i = NonNegative{2}.get();
         </section>
         <section>
            <h3> Constructors</h3>
-           <p> Each of it's parameters must be Literal Type
+           <p> Each of its parameters must be Literal Type
            <p> The class must not have virtual base classes </p>
            <p> Can be defaulted, deleted </p>
            <p> The same constraints as for constexpr function, except single return statement </p>
@@ -525,7 +523,7 @@ constexpr bool close_enough(T a, T b) {
           <h2> C++20 </h2>
         </section> 
         <section>
-          <p> In C++20 we will have even more constexpr addition </p>
+          <p> In C++20 we will have even more constexpr additions </p>
         </section> 
         <section>
           <p> try-catch allowed in function </p>
@@ -569,7 +567,7 @@ namespace ranges {
           <h2> Summary </h2>
 <ul>
           <li> With newer versions of the standard constexpr has more and more support </li>
-          <li> We should almost always preffer compile-time computations - they are done only once! </li>
+          <li> We should almost always prefer compile-time computations - they are done only once! </li>
           <li> Even if function is not used in compile time at the moment but it's possible to make it constexpr - make it constexpr</li>
 </ul>
         </section>
@@ -577,15 +575,14 @@ namespace ranges {
           <h1> Questions? </h1>
         </section>
         <section>
-          <h1> Thank you! </h1>
-        </section>
-        <section>
           <p> Did you know cpp-polska.pl? </p>
+          <img src="img/cpppolska.png" height=300/>
           <p> If you love C++ - join our slack! - c++ quizes, blogposts, questions, interesting libraries and more! <a href="http://bit.ly/cpppolska-slack">bit.ly/cpppolska-slack</a></p>
         </section>
         <section>
           <p>Sources: </p>
           <ul>
+            <li> <a href="https://abseil.io/tips/153">Abseil tips - don't use using namespace</a></li>
             <li> <a href="https://www.youtube.com/watch?v=PJwd4JLYJJY">CppCon 2017: "constexpr ALL the Things"</a></li>
             <li> <a href="https://www.youtube.com/watch?v=JXJg_XMJFW0">C++ Weekly Ep 159 - 'constexpr' 'virtual' Members in C++20</a></li>
             <li> <a href="https://en.cppreference.com/w/cpp/language/constexpr"> cppreference.com </a></li>
