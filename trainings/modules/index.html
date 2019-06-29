@@ -1,0 +1,125 @@
+<!doctype html>
+<html>
+	<head> <meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	    <title>constexpr-land</title>
+
+		<link rel="stylesheet" href="../reveal.js/css/reveal.css">
+		<link rel="stylesheet" href="../reveal.js/css/theme/beige.css">
+		<!-- league -->
+
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="../reveal.js/lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? '../reveal.js/css/print/pdf.css' : '../reveal.js/css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+          <h2> C++20 Modules part 1</h2>
+					<p>
+    Future is now, old dev                
+					</p>
+					<p>
+						<small>wrazik, 2019</small>
+					</p>
+        </section>
+        <section>
+          <h2> C++ is easy! </h2>
+          <img class="fragment" src="img/cppkids.jpg" height=500/>
+        </section>
+        <section>
+          <h3> WE WILL HAVE MODULES IN C++20 </h3>
+<p><img src="img/jesus.jpg" height=400/></p>
+        </section>
+        <section>
+          <h3> Introduction </h3>
+           <p> C++ Modules were accepted in C++20. They are already merged into ISO C++ Standard Draft </p>
+           <p> Suggested module file extension: cppm(clang), ixx(msvs), cc|cpp(gcc) </p> 
+        </section>
+        <section>
+          <h3> Introduction </h3>
+<pre class="code"><code>// my_module.cppm
+export module math;
+
+export int add(int fir, int sec){
+    return fir + sec;
+} 
+</code></pre>
+<pre class="code"><code>// main.cpp
+import math;
+
+int main(){
+   add(2000, 20);
+}
+</code></pre>
+        </section>
+        <section>
+           <h3>Super-simplified compilation process with headers and cpp</h3>
+           <img src="img/old_process.png" height=300/>
+        </section>
+        <section>
+           <h3>Super-simplified compilation process with modules</h3>
+        </section>
+        <section>
+<p> Before C++20, we have term "Translation Unit" </p>
+<p> C++20 introduces new terms:</p>
+<ul>
+<li>module interface unit</li>
+<li>module implementation unit </li>
+<li>module partition</li>
+<li>module interface partition </li>
+<li>module implementation partition </li>
+</ul>
+        </section>
+        <section>
+          <h2> module interface unit </h2>
+<p> A module interface unit is a module unit where the module-declaration contains the export keyword. There can be any number of these in a module.</p>
+        </section>
+        <section>
+          <h2> module interface unit </h2>
+          <h3> Primary module interface unit </h3>
+<pre class="code"><code>// primary 
+export module my_module;
+</code></pre>
+<pre class="code"><code>// NOT primary 
+export module my_module:foo;
+</code></pre>
+<pre class="code"><code>// NOT primary 
+module my_module;
+</code></pre>
+        </section>
+        <section>
+          <h1> Thank you! </h1>
+        </section>
+			</div>
+		</div>
+
+		<script src="../reveal.js/lib/js/head.min.js"></script>
+		<script src="../reveal.js/js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+				dependencies: [
+					{ src: '../reveal.js/plugin/markdown/marked.js' },
+					{ src: '../reveal.js/plugin/markdown/markdown.js' },
+					{ src: '../reveal.js/plugin/notes/notes.js', async: true },
+					{ src: '../reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+		</script>
+	</body>
+</html>
